@@ -1,0 +1,90 @@
+{% extends "admin/change_form.html" %}
+
+{% block after_related_objects %}
+    {{ block.super }}
+    <h2 style="text-align: center;">いいねしたBOOKLIST</h2>
+    <table id="booklist-table" class="sortable">
+        <thead>
+            <tr>
+                <th onclick="sortTable(0)">BookList Title</th>
+                <th onclick="sortTable(1)">Owner</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for like in original.booklist_set.all %}
+                <tr>
+                    <td>{{ like.title }}</td>
+                    <td>{{ like.owner.username }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <style>
+        table.sortable {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 0 0 40px 0;
+        }
+        table.sortable th, table.sortable td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        table.sortable th {
+            cursor: pointer;
+            background-color: #f2f2f2;
+        }
+        table.sortable th:hover {
+            background-color: #ddd;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #ddd;
+        }
+        h2 {
+            margin-top: 20px;
+            margin-bottom: 10px; /* タイトルとテーブルの間隔を狭く */
+        }
+    </style>
+
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("booklist-table");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        }
+    </script>
+{% endblock %}
