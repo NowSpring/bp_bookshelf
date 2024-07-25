@@ -8,6 +8,7 @@ class BookListAdmin(admin.ModelAdmin):
 
   list_display = ('title', 'owner_name')
   filter_horizontal = ('likes',)
+  change_form_template = 'admin/books/booklist/change_form.html'
 
   @admin.display(ordering='owner__username', description='編集者')
   def owner_name(self, obj):
