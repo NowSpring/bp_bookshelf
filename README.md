@@ -1,10 +1,5 @@
 # Web アプリ環境テンプレ
 
-## Docker 環境構築（Django×Vue）
-
-- [Docker で Python×Django×Vue.js の環境を構築する(サーバー起動編)](https://www.miracleave.co.jp/contents/1715/post-1715/)
-- [Docker で Python×Django×Vue.js の環境を構築する(CORS 認証編)](https://www.miracleave.co.jp/contents/1863/post-1863/)
-
 ## バックエンドサーバー 編集
 
 ### DB 関連
