@@ -45,7 +45,3 @@ class PersonalBook(models.Model):
 
     ordering = ['order']
     unique_together = ('book', 'booklist', 'order')
-
-  def __str__(self):
-
-    return f"{self.book.title} at {self.order} in {self.booklist.title}"
