@@ -20,6 +20,26 @@ class BookListAdmin(admin.ModelAdmin):
 
     return ", ".join([like.username for like in obj.likes.all()])
 
+  def get_queryset(self, request):
+
+    queryset = super().get_queryset(request).select_related('owner').prefetch_related('personal_books__book')
+
+    return queryset
+
+  def change_view(self, request, object_id, form_url='', extra_context=None):
+
+    extra_context = extra_context or {}
+    extra_context['show_table'] = True  # 変更画面ではテーブルを表示
+
+    return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
+  def add_view(self, request, form_url='', extra_context=None):
+
+    extra_context = extra_context or {}
+    extra_context['show_table'] = False  # 追加画面ではテーブルを表示しない
+
+    return super().add_view(request, form_url, extra_context=extra_context)
+
 
 @admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
