@@ -3,8 +3,11 @@ from rest_framework import viewsets, status
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 
+
+from django.conf import settings
+from django.contrib.auth import get_user_model
 from members.models import Member
-from books.models import BookList, Book, PersonalBook
+from books.models import BookList, Book, PersonalBook, BookListLike
 from books.serializers import BookListSerializer, BookSerializer, BulkBookUpdateSerializer, PersonalBookSerializer
 
 class BookListViewSet(viewsets.ModelViewSet):
@@ -14,7 +17,7 @@ class BookListViewSet(viewsets.ModelViewSet):
 
   def get_queryset(self):
 
-    queryset = super().get_queryset().select_related('owner').prefetch_related('booklist')
+    queryset = super().get_queryset().select_related('owner').prefetch_related('personal_books__book')
     member_id = self.request.query_params.get('member_id', None)
 
     if member_id is not None:
@@ -85,19 +88,43 @@ class BookListViewSet(viewsets.ModelViewSet):
 
       booklist = BookList.objects.get(id=booklist_id)
       reviewer = Member.objects.get(id=reviewer_id)
+      owner = booklist.owner
+
+      booklist_data = {
+        "id": str(booklist.id),
+        "title": booklist.title,
+        "version": booklist.version,
+        "books": list(booklist.personal_books.values('book__id', 'book__title', 'book__description', 'book__price', 'book__link', 'book__image', 'order'))
+      }
+
+      booklist_like, created = BookListLike.objects.get_or_create(reviewer=reviewer, owner=owner)
 
       if like:
 
-        if not booklist.likes.filter(id=reviewer_id).exists():
+        if created or not any(bl['id'] == str(booklist.id) for bl in booklist_like.booklists):
 
-          booklist.likes.add(reviewer)
+          booklist_like.booklists.append(booklist_data)
+
+        else:
+
+          for i, bl in enumerate(booklist_like.booklists):
+
+            if bl['id'] == str(booklist.id):
+
+              if bl['version'] != booklist.version:
+
+                  booklist_like.booklists[i] = booklist_data
+
+              break
+
+        booklist.likes.add(reviewer)
 
       else:
 
-        if booklist.likes.filter(id=reviewer_id).exists():
+        booklist_like.booklists = [bl for bl in booklist_like.booklists if bl['id'] != str(booklist.id)]
+        booklist.likes.remove(reviewer)
 
-          booklist.likes.remove(reviewer)
-
+      booklist_like.save()
       booklist.save()
 
       return Response(status=status.HTTP_204_NO_CONTENT)
@@ -133,6 +160,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
   @action(detail=False, methods=['get'], url_path='personalbook')
   def get_personalbook(self, request, *args, **kwargs):
+
     personalbook_id = request.query_params.get('id')
 
     if not personalbook_id:

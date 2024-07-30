@@ -24,9 +24,9 @@ class BookList(models.Model):
     if self.pk:
 
       self.version = LogEntry.objects.filter(
-          content_type__model='booklist',
-          object_id=self.pk,
-          action_flag=CHANGE
+        content_type__model='booklist',
+        object_id=self.pk,
+        action_flag=CHANGE
       ).count()
 
     super().save(*args, **kwargs)
@@ -43,9 +43,9 @@ class BookList(models.Model):
     else:
 
       self.version = LogEntry.objects.filter(
-          content_type__model='booklist',
-          object_id=self.pk,
-          action_flag=CHANGE
+        content_type__model='booklist',
+        object_id=self.pk,
+        action_flag=CHANGE
       ).count()
 
 
@@ -78,3 +78,18 @@ class PersonalBook(models.Model):
 
     ordering = ['order']
     unique_together = ('book', 'booklist', 'order')
+
+
+class BookListLike(models.Model):
+
+  reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='liked_booklist_likes')
+  owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='booklist_likes')
+  booklists = models.JSONField(default=list)
+
+  class Meta:
+
+    unique_together = ('reviewer', 'owner')
+
+  def __str__(self):
+
+    return f"{self.reviewer} liked booklists of {self.owner}"

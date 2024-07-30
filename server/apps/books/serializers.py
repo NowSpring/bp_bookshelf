@@ -74,7 +74,7 @@ class BulkBookUpdateSerializer(serializers.Serializer):
 class BookListSerializer(serializers.ModelSerializer):
 
   owner = MemberGetSerializer(read_only=True)
-  books = BookSerializer(many=True, read_only=True, source='booklist')
+  books = PersonalBookSerializer(many=True, read_only=True, source='personal_books')
   likes = serializers.SerializerMethodField()
 
   class Meta:
@@ -84,7 +84,7 @@ class BookListSerializer(serializers.ModelSerializer):
 
   def get_books(self, obj):
 
-    books = obj.booklist.order_by('order')
+    books = obj.personal_books.order_by('order')
 
     return BookSerializer(books, many=True, read_only=True).data
 

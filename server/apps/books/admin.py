@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib import admin
-from .models import BookList, Book, PersonalBook
+from .models import BookList, Book, PersonalBook, BookListLike
 from django.utils.html import format_html
 
 
@@ -21,28 +21,11 @@ class PersonalBookInline(admin.TabularInline):
     return 1
 
 
-class BookListAdminForm(forms.ModelForm):
-  class Meta:
-
-    model = BookList
-    fields = '__all__'
-
-  def save(self, commit=True):
-
-    instance = super().save(commit=False)
-
-    if commit:
-
-      instance.save()
-
-    return instance
-
 @admin.register(BookList)
 class BookListAdmin(admin.ModelAdmin):
 
   list_display = ('title', 'owner_name')
   filter_horizontal = ('likes',)
-  form = BookListAdminForm
   inlines = [PersonalBookInline]
   readonly_fields = ('version',)
 
@@ -89,3 +72,27 @@ class BookAdmin(admin.ModelAdmin):
     extra_context['show_table'] = False  # 追加画面ではテーブルを表示しない
 
     return super().add_view(request, form_url, extra_context=extra_context)
+
+
+@admin.register(BookListLike)
+class BookListLikeAdmin(admin.ModelAdmin):
+
+  list_filter = ('reviewer', 'owner')
+  list_display = ('reviewer', 'owner')
+  search_fields = ('reviewer__username', 'owner__username')
+  fieldsets = (
+    (None, {
+      'fields': ()
+    }),
+  )
+  change_form_template = 'admin/books/booklistlike/change_form.html'
+
+  def get_queryset(self, request):
+
+    queryset = super().get_queryset(request)
+
+    return queryset.select_related('reviewer', 'owner')
+
+  def has_add_permission(self, request):
+
+    return False
