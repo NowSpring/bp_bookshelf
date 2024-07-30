@@ -3,6 +3,7 @@
 
 {% block after_related_objects %}
     {{ block.super }}
+    {% if show_table %}
     <h2 style="text-align: center;">{{ original.title }}が含まれる本棚</h2>
     <table id="booklist-table" class="sortable">
         <thead>
@@ -20,6 +21,7 @@
             {% endfor %}
         </tbody>
     </table>
+    {% endif %}
 
     <style>
         table.sortable {

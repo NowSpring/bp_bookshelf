@@ -30,6 +30,16 @@ class BookSerializer(serializers.ModelSerializer):
     model = Book
     fields = ['id', 'title', 'description', 'image', 'personal_books']
 
+  def get_personal_books(self, obj):
+
+    personal_books = obj.personal_books.all()
+
+    if personal_books is None:
+
+      return []
+
+    return PersonalBookSerializer(personal_books, many=True).data
+
 
 class BulkBookUpdateSerializer(serializers.Serializer):
 

@@ -48,4 +48,4 @@ class PersonalBook(models.Model):
 
   def __str__(self):
 
-    return f"{self.book.title} - {self.order}"
+    return f"{self.book.title} at {self.order} in {self.booklist.title}"

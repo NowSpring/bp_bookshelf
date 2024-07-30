@@ -5,6 +5,10 @@ register = template.Library()
 @register.filter
 def unique_booklists(personal_books):
 
+  if personal_books is None:
+
+    return []
+
   unique = []
   seen = set()
 

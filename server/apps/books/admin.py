@@ -33,3 +33,17 @@ class BookAdmin(admin.ModelAdmin):
     queryset = super().get_queryset(request)
 
     return queryset.prefetch_related('personal_books__booklist__owner')
+
+  def change_view(self, request, object_id, form_url='', extra_context=None):
+
+    extra_context = extra_context or {}
+    extra_context['show_table'] = True  # 変更画面ではテーブルを表示
+
+    return super().change_view(request, object_id, form_url, extra_context=extra_context)
+
+  def add_view(self, request, form_url='', extra_context=None):
+
+    extra_context = extra_context or {}
+    extra_context['show_table'] = False  # 追加画面ではテーブルを表示しない
+
+    return super().add_view(request, form_url, extra_context=extra_context)
