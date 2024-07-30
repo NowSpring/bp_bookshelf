@@ -44,6 +44,7 @@ class BookListAdmin(admin.ModelAdmin):
   filter_horizontal = ('likes',)
   form = BookListAdminForm
   inlines = [PersonalBookInline]
+  readonly_fields = ('version',)
 
   @admin.display(ordering='owner__username', description='編集者')
   def owner_name(self, obj):

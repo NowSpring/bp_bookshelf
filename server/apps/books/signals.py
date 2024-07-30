@@ -1,5 +1,5 @@
 import os
-from django.db.models.signals import post_save, pre_save, pre_delete
+from django.db.models.signals import post_save, post_delete, pre_save, pre_delete
 from django.dispatch import receiver, Signal
 from django.conf import settings
 from .models import BookList, Book, PersonalBook
@@ -39,4 +39,3 @@ def create_booklist_books(sender, instance, **kwargs):
     personal_books.append(personal_book)
 
   PersonalBook.objects.bulk_create(personal_books)
-
